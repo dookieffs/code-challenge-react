@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import Papa from 'papaparse';
-import { products } from './utils/products';
+import React, { useEffect, useState } from "react";
+// import Papa from 'papaparse';
+import { products } from "./utils/products";
+import { useFetch } from "./hooks/useFetch";
+import { getProductList } from "./repositories/product";
+import { ProductList } from "./components/ProductList";
 
 interface Product {
   ProductID: string;
@@ -12,27 +15,18 @@ interface Product {
 }
 
 const App: React.FC = () => {
-  const [data, setData] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data, error, isLoading } = useFetch(() => getProductList());
 
-  useEffect(() => {
-    setLoading(true);
-    // Simulate loading data
-    setTimeout(() => {
-        setData(products as any);
-        setLoading(false);
-    }, 2000);
-    
-  }, []);
+  if (isLoading) {
+    console.log(data);
+  }
 
   return (
     <div className="App">
       <h1>Product Dashboard</h1>
-      {/* Table or component to display products will go here */}
-      {loading && <p>Loading data...</p>}
-      {!loading && data && (
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-      )}
+
+      {isLoading && <p>Loading data...</p>}
+      {!isLoading && data && <ProductList products={data} />}
     </div>
   );
 };
